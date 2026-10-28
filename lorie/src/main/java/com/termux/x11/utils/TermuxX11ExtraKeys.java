@@ -3,6 +3,7 @@ package com.termux.x11.utils;
 import static com.termux.x11.extrakeys.ExtraKeysConstants.PRIMARY_KEY_CODES_FOR_STRINGS;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import android.accessibilityservice.AccessibilityService;
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -39,7 +40,7 @@ public class TermuxX11ExtraKeys implements ExtraKeysView.IExtraKeysView {
     private boolean metaDown;
 
     /** Defines the key for extra keys */
-    public static final String DEFAULT_IVALUE_EXTRA_KEYS = "[['ESC','/',{key: '-', popup: '|'},'HOME','UP',{key: 'END', popup: 'ZOOM_IN'},{key: 'PGUP', popup: 'ZOOM_OUT'},{key: 'KEYBOARD', popup: 'ZOOM_RESET'}], ['TAB','CTRL','ALT','LEFT','DOWN','RIGHT','PGDN','PREFERENCES']]"; // Double row
+    public static final String DEFAULT_IVALUE_EXTRA_KEYS = "[['ESC','/',{key: '-', popup: '|'},'HOME','UP',{key: 'END', popup: 'ZOOM_IN'},{key: 'PGUP', popup: 'ZOOM_OUT'},{key: 'KEYBOARD', popup: 'ZOOM_RESET'}], ['TAB','CTRL','ALT','LEFT','DOWN','RIGHT','PGDN','PREFERENCES'], [{key: 'NAV_RECENTS', display: '|||'}, {key: 'NAV_HOME', display: '\u25CB'}, {key: 'NAV_BACK', display: '\u2039'}]]"; // Triple row
 
     public TermuxX11ExtraKeys(@NonNull View.OnKeyListener eventlistener, MainActivity activity, ExtraKeysView extrakeysview) {
         mEventListener = eventlistener;
@@ -214,8 +215,19 @@ public class TermuxX11ExtraKeys implements ExtraKeysView.IExtraKeysView {
             mActivity.getLorieView().adjustRendererZoom(-25);
         else if ("ZOOM_RESET".equals(key))
             mActivity.getLorieView().resetRendererZoom();
+        else if ("NAV_BACK".equals(key))
+            navigate(AccessibilityService.GLOBAL_ACTION_BACK);
+        else if ("NAV_HOME".equals(key))
+            navigate(AccessibilityService.GLOBAL_ACTION_HOME);
+        else if ("NAV_RECENTS".equals(key))
+            navigate(AccessibilityService.GLOBAL_ACTION_RECENTS);
         else
             onTerminalExtraKeyButtonClick(view, key, ctrlDown, altDown, shiftDown, metaDown, fnDown);
+    }
+
+    private void navigate(int globalAction) {
+        if (!KeyInterceptor.performNavigation(globalAction))
+            Toast.makeText(mActivity, "Enable the Termux:X11 accessibility service (Settings > Accessibility) to use the navigation buttons", Toast.LENGTH_LONG).show();
     }
 
     /**
