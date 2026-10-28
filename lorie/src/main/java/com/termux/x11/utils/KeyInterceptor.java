@@ -61,6 +61,11 @@ public class KeyInterceptor extends AccessibilityService {
         }
     }
 
+    /** Performs a system navigation action (back/home/recents) through the accessibility service. */
+    public static boolean performNavigation(int globalAction) {
+        return self != null && self.performGlobalAction(globalAction);
+    }
+
     public static boolean isLaunched() {
         AccessibilityServiceInfo info = self == null ? null : self.getServiceInfo();
         return info != null && info.getId() != null;
